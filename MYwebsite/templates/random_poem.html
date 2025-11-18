@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}随机诗文 - 趣味诗文网{% endblock %}
+
+{% block content %}
+<div class="random-poem-container">
+    <h1>随机诗文</h1>
+    <p>每次刷新都会获得一首随机的诗文</p>
+    
+    <div class="poem-display">
+        <h2>{{ poem.title }}</h2>
+        <p class="author-dynasty">{{ poem.author }} [{{ poem.dynasty }}]</p>
+        
+        <div class="poem-content">
+            {% for line in poem.content.split('\n') %}
+            <p>{{ line }}</p>
+            {% endfor %}
+        </div>
+        
+        <div class="actions">
+            <a href="{{ url_for('random_poem') }}" class="btn">再随机一首</a>
+            <a href="{{ url_for('poem_detail', poem_id=poem.id) }}" class="btn">查看详情</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

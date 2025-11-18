@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}诗文游戏 - 趣味诗文网{% endblock %}
+
+{% block content %}
+<div class="game-container">
+    <h1>诗文游戏</h1>
+    
+    <div class="game-options">
+        <div class="game-card">
+            <h2>诗句填空</h2>
+            <p>测试你对经典诗句的记忆</p>
+            <button class="btn" onclick="startFillGame()">开始游戏</button>
+        </div>
+        
+        <div class="game-card">
+            <h2>作者配对</h2>
+            <p>将诗句与作者正确配对</p>
+            <button class="btn" onclick="startMatchGame()">开始游戏</button>
+        </div>
+    </div>
+    
+    <div id="game-area" class="game-area">
+        <!-- 游戏内容将通过JavaScript动态加载 -->
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function startFillGame() {
+    fetch('/api/random_poem')
+        .then(response => response.json())
+        .then(poem => {
+            const lines = poem.content.split('\n');
+            // 简单实现：隐藏每行的最后一个词
+            const gameHTML = `
+                <h2>诗句填空</h2>
+                <p>补全以下诗句：</p>
+                <div class="poem-lines">
+                    ${lines.map(line => {
+                        const words = line.split('');
+                        words[words.length-1] = '___';
+                        return `<p>${words.join('')}</p>`;
+                    }).join('')}
+                </div>
+                <button class="btn" onclick="showAnswer()">显示答案</button>
+                <div id="answer" style="display:none">
+                    <h3>正确答案：</h3>
+                    <p>${poem.content.replace(/\n/g, '<br>')}</p>
+                </div>
+            `;
+            document.getElementById('game-area').innerHTML = gameHTML;
+        });
+}
+
+function showAnswer() {
+    document.getElementById('answer').style.display = 'block';
+}
+
+function startMatchGame() {
+    // 简化实现
+    document.getElementById('game-area').innerHTML = `
+        <h2>作者配对</h2>
+        <p>功能开发中，敬请期待...</p>
+    `;
+}
+</script>
+{% endblock %}

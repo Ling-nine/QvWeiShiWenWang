@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}{{ poem.title }} - 趣味诗文网{% endblock %}
+
+{% block content %}
+<div class="poem-detail">
+    <h1>{{ poem.title }}</h1>
+    <p class="author-dynasty">{{ poem.author }} [{{ poem.dynasty }}]</p>
+    
+    <div class="poem-content">
+        {% for line in poem.content.split('\n') %}
+        <p>{{ line }}</p>
+        {% endfor %}
+    </div>
+    
+    <div class="poem-tags">
+        {% for tag in poem.tags.split(',') %}
+        <span class="tag">{{ tag }}</span>
+        {% endfor %}
+    </div>
+    
+    <div class="actions">
+        <a href="{{ url_for('random_poem') }}" class="btn">随机一首</a>
+        <button onclick="sharePoem()" class="btn">分享这首诗</button>
+    </div>
+</div>
+
+<div class="comments-section">
+    <h2>评论</h2>
+    
+    <form class="comment-form" action="{{ url_for('add_comment', poem_id=poem.id) }}" method="post">
+        <input type="text" name="username" placeholder="您的名字（可选）" class="form-input">
+        <textarea name="content" placeholder="写下您的评论..." required class="form-textarea"></textarea>
+        <button type="submit" class="btn">提交评论</button>
+    </form>
+    
+    <div class="comments-list">
+        {% for comment in poem.comments|sort(attribute='created_at', reverse=True) %}
+        <div class="comment">
+            <p class="comment-author">{{ comment.username }}</p>
+            <p class="comment-content">{{ comment.content }}</p>
+            <p class="comment-date">{{ comment.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+        </div>
+        {% else %}
+        <p>暂无评论，快来发表第一条评论吧！</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function sharePoem() {
+    if (navigator.share) {
+        navigator.share({
+            title: '{{ poem.title }} - {{ poem.author }}',
+            text: '{{ poem.content.split("\n")[0] }}...',
+            url: window.location.href
+        })
+        .then(() => console.log('分享成功'))
+        .catch((error) => console.log('分享失败', error));
+    } else {
+        // 如果不支持Web Share API，则复制链接到剪贴板
+        navigator.clipboard.writeText(window.location.href)
+        .then(() => alert('链接已复制到剪贴板！'))
+        .catch(err => alert('复制失败，请手动复制链接：' + window.location.href));
+    }
+}
+</script>
+{% endblock %}
